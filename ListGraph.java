@@ -273,7 +273,20 @@ public class ListGraph<V, E> extends DirectedGraph<V, E>
      */
     public Iterator<Edge<V, E>> edges()
     {
-        return null;
+        ArrayList<Edge<V, E>> arr = new ArrayList<>();
+
+        for (HashMap<V, Edge<V, E>> v : _adjacencies.values())
+        {
+            for (Edge<V, E> edge : v.values())
+            {
+                if (edge != null)
+                {
+                    arr.add(edge);
+                }
+            }
+        }
+
+        return arr.iterator();
     }
 
 
