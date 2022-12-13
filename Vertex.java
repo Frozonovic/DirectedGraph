@@ -1,21 +1,26 @@
 public class Vertex<V>
 {
+    private final V _label;
+
+
     public Vertex(V label)
     {
-        // FIXME
+        if (label == null)
+        {
+            throw new IllegalArgumentException("Error: Null is considered an invalid value");
+        }
+        _label = label;
     }
 
 
     public V getLabel()
     {
-        // FIXME
-        return null;
+        return _label;
     }
 
 
     public boolean equals(Vertex<V> o)
     {
-        // FIXME
-        return false;
+        return getLabel() == o.getLabel();
     }
 }

@@ -1,41 +1,54 @@
 public class Edge<V, E>
 {
+    private final V _u;
+    private final V _v;
+    private E _label;
+
+
     public Edge(V u, V v, E label)
     {
-        // FIXME
+        if (label == null)
+        {
+            throw new IllegalArgumentException("Error: Null is considered an invalid value");
+        }
+
+        _u = u;
+        _v = v;
+        _label = label;
     }
 
 
     public V getU()
     {
-        // FIXME
-        return null;
+        return _u;
     }
 
 
     public V getV()
     {
-        // FIXME
-        return null;
+        return _v;
     }
 
 
     public E getLabel()
     {
-        // FIXME
-        return null;
+        return _label;
     }
 
 
     public void setLabel(E label)
     {
-        // FIXME
+        if (label == null)
+        {
+            throw new IllegalArgumentException("Error: Null is considered an invalid value");
+        }
+
+        _label = label;
     }
 
 
     public boolean equals(Edge<V, E> o)
     {
-        // FIXME
-        return false;
+        return o.getU().equals(_u) && o.getV().equals(_v);
     }
 }
