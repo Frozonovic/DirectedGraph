@@ -1,6 +1,7 @@
 // Imports
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.ArrayList;
 
 
 /**
@@ -242,7 +243,14 @@ public class ListGraph<V, E> extends DirectedGraph<V, E>
      */
     public Iterator<Vertex<V>> vertices()
     {
-        return null;
+        ArrayList<Vertex<V>> arr = new ArrayList<>(_vertices.size());
+
+        for (Vertex<V> v : _vertices.values())
+        {
+            arr.add(v);
+        }
+
+        return arr.iterator();
     }
 
 

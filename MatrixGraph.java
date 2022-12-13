@@ -1,6 +1,6 @@
 // Imports
-import java.util.Arrays;
 import java.util.Iterator;
+import java.util.ArrayList;
 
 
 /**
@@ -60,12 +60,7 @@ public class MatrixGraph<V, E> extends DirectedGraph<V, E>
         lastIndex = 0;
         _edgeCount = 0;
 
-        Arrays.fill(_vertices, null);
-
-        for (Edge<V, E>[] edge : _adjacencyMatrix)
-        {
-            Arrays.fill(edge, null);
-        }
+        clear();
     }
 
 
@@ -345,7 +340,15 @@ public class MatrixGraph<V, E> extends DirectedGraph<V, E>
      */
     public Iterator<Vertex<V>> vertices()
     {
-        return null;
+        ArrayList<Vertex<V>> arr = new ArrayList<>(_vertices.length);
+
+        for (Vertex<V> v : _vertices)
+        {
+            arr.add(v);
+        }
+
+        return arr.iterator();
+
     }
 
 
@@ -368,7 +371,20 @@ public class MatrixGraph<V, E> extends DirectedGraph<V, E>
      */
     public Iterator<Edge<V, E>> edges()
     {
-        return null;
+        ArrayList<Edge<V, E>> arr = new ArrayList<>();
+
+        for (Edge<V, E>[] adjacencyMatrix : _adjacencyMatrix)
+        {
+            for (Edge<V, E> edge : adjacencyMatrix)
+            {
+                if (edge != null)
+                {
+                    arr.add(edge);
+                }
+            }
+        }
+
+        return arr.iterator();
     }
 
 
@@ -377,7 +393,18 @@ public class MatrixGraph<V, E> extends DirectedGraph<V, E>
      */
     public void clear()
     {
+        _size = 0;
+        _edgeCount = 0;
 
+        for (int i = 0; i < _adjacencyMatrix.length; i++)
+        {
+            _vertices[i] = null;
+
+            for (int j = 0; j < _adjacencyMatrix[i].length; j++)
+            {
+                _adjacencyMatrix[i][j] = null;
+            }
+        }
     }
 
 
