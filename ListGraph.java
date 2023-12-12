@@ -5,44 +5,39 @@ import java.util.ArrayList;
 
 
 /**
- * Custom class utilizing HashMap for vertex/edge relationships
+ * Custom ListGraph class
  *
  * @author blee20@georgefox.edu
  * @param <V> Label type for vertices
  * @param <E> Label type for edges
  */
-public class ListGraph<V, E> extends DirectedGraph<V, E>
-{
-    // Instance Variables
+public class ListGraph<V, E> extends DirectedGraph<V, E> {
+    // Internal State
     private final HashMap<V, Vertex<V>> _vertices;
     private final HashMap<V, HashMap<V, Edge<V, E>>> _adjacencies;
     private int _size;
     private int _edgeCount;
 
 
+    // Constructor
     /**
      * Creates an instance of class ListGraph object
      */
-    public ListGraph()
-    {
+    public ListGraph() {
         _vertices = new HashMap<>();
         _adjacencies = new HashMap<>();
     }
 
 
+    // Methods
     /**
      * Creates a new vertex and adds it to the graph
      *
      * @param u Vertex label
      */
-    public void add(V u)
-    {
-        checkNullVertex(u);
-
-        if (contains(u))
-        {
-            throw new DuplicateVertexException();
-        }
+    public void add(V u) {
+        // Null and duplicate vertex handler
+        duplicateVertex(u);
 
         _vertices.put(u, new Vertex<>(u));
         _size++;
@@ -55,9 +50,9 @@ public class ListGraph<V, E> extends DirectedGraph<V, E>
      * @param u Vertex label
      * @return True if vertex with label exists, else false
      */
-    public boolean contains(V u)
-    {
-        checkNullVertex(u);
+    public boolean contains(V u) {
+        // Null vertex handler
+        nullVertex(u);
 
         return _vertices.containsKey(u);
     }
@@ -69,14 +64,9 @@ public class ListGraph<V, E> extends DirectedGraph<V, E>
      * @param u Vertex label
      * @return Vertex of type V with corresponding label
      */
-    public Vertex<V> get(V u)
-    {
-        checkNullVertex(u);
-
-        if (!_vertices.containsKey(u))
-        {
-            throw new NoSuchVertexException();
-        }
+    public Vertex<V> get(V u) {
+        // Null and non-existent vertex handler
+        noVertex(u);
 
         return _vertices.get(u);
     }
@@ -88,9 +78,9 @@ public class ListGraph<V, E> extends DirectedGraph<V, E>
      * @param u Vertex label
      * @return Deleted vertex's label
      */
-    public V remove(V u)
-    {
-        checkNullVertex(u);
+    public V remove(V u) {
+        // Null and non-existent vertex handler
+        noVertex(u);
 
         _size--;
 
@@ -105,24 +95,12 @@ public class ListGraph<V, E> extends DirectedGraph<V, E>
      * @param v Destination vertex label
      * @param label Edge label
      */
-    public void addEdge(V u, V v, E label)
-    {
-        checkNullVertex(u);
-        checkNullVertex(v);
-        checkNullEdge(label);
+    public void addEdge(V u, V v, E label) {
+        // Duplicate edge, null vertices, and non-existent vertices are handled within
+        duplicateEdge(u, v);
 
-        if (containsEdge(u, v))
-        {
-            throw new DuplicateEdgeException();
-        }
-        if (!contains(u) || !contains(v))
-        {
-            throw new NoSuchVertexException();
-        }
-        if (!_adjacencies.containsKey(u))
-        {
-            _adjacencies.put(u, new HashMap<>(10));
-            _adjacencies.get(u).put(v, new Edge<>(u, v, label));
+        if (!_adjacencies.containsKey(u)) {
+            _adjacencies.put(u, new HashMap<>());
         }
 
         _adjacencies.get(u).put(v, new Edge<>(u, v, label));
@@ -138,17 +116,12 @@ public class ListGraph<V, E> extends DirectedGraph<V, E>
      * @param v Destination vertex label
      * @return True if edge exists from u to v, else false
      */
-    public boolean containsEdge(V u, V v)
-    {
-        checkNullVertex(u);
-        checkNullVertex(v);
+    public boolean containsEdge(V u, V v) {
+        // Null and non-existent vertices handled within
+        noVertex(u);
+        noVertex(v);
 
-        if (!contains(u) || !contains(v))
-        {
-            throw new NoSuchVertexException();
-        }
-
-        return _adjacencies.get(u).containsKey(v);
+        return _adjacencies.containsKey(u) && _adjacencies.get(u).containsKey(v);
     }
 
 
@@ -159,19 +132,13 @@ public class ListGraph<V, E> extends DirectedGraph<V, E>
      * @param v Destination vertex label
      * @return Edge of type E from u to v
      */
-    public Edge<V, E> getEdge(V u, V v)
-    {
-        checkNullVertex(u);
-        checkNullVertex(v);
+    public Edge<V, E> getEdge(V u, V v) {
+        // Null and non-existent vertices are handled within
+        noVertex(u);
+        noVertex(v);
 
-        if (!contains(u) || !contains(v))
-        {
-            throw new NoSuchVertexException();
-        }
-        if (!containsEdge(u, v))
-        {
-            throw new NoSuchEdgeException();
-        }
+        // Non-existent edge handler
+        noEdge(u, v);
 
         return _adjacencies.get(u).get(v);
     }
@@ -184,19 +151,11 @@ public class ListGraph<V, E> extends DirectedGraph<V, E>
      * @param v Destination vertex label
      * @return Deleted edge's label
      */
-    public E removeEdge(V u, V v)
-    {
-        checkNullVertex(u);
-        checkNullVertex(v);
-
-        if (!containsEdge(u, v))
-        {
-            throw new NoSuchEdgeException();
-        }
+    public E removeEdge(V u, V v) {
+        // Null vertices, non-existent vertices, and non-existent edge are handled within
+        noEdge(u, v);
 
         _edgeCount--;
-
-
 
         return _adjacencies.get(u).remove(v).getLabel();
     }
@@ -207,8 +166,7 @@ public class ListGraph<V, E> extends DirectedGraph<V, E>
      *
      * @return Number of vertices in graph
      */
-    public int size()
-    {
+    public int size() {
         return _size;
     }
 
@@ -219,8 +177,9 @@ public class ListGraph<V, E> extends DirectedGraph<V, E>
      * @param u Source vertex label
      * @return Number of edges from u to another vertex
      */
-    public int degree(V u)
-    {
+    public int degree(V u) {
+        noVertex(u);
+
         return _adjacencies.get(u).size();
     }
 
@@ -230,8 +189,7 @@ public class ListGraph<V, E> extends DirectedGraph<V, E>
      *
      * @return Number of edges in graph
      */
-    public int edgeCount()
-    {
+    public int edgeCount() {
         return _edgeCount;
     }
 
@@ -241,12 +199,10 @@ public class ListGraph<V, E> extends DirectedGraph<V, E>
      *
      * @return A new vertex iterator object
      */
-    public Iterator<Vertex<V>> vertices()
-    {
+    public Iterator<Vertex<V>> vertices() {
         ArrayList<Vertex<V>> arr = new ArrayList<>(_vertices.size());
 
-        for (Vertex<V> v : _vertices.values())
-        {
+        for (Vertex<V> v : _vertices.values()) {
             arr.add(v);
         }
 
@@ -260,9 +216,18 @@ public class ListGraph<V, E> extends DirectedGraph<V, E>
      * @param u Source vertex
      * @return A new iterator object
      */
-    public Iterator<Vertex<V>> adjacent(V u)
-    {
-        return null;
+    public Iterator<Vertex<V>> adjacent(V u) {
+        ArrayList<Vertex<V>> arr = new ArrayList<>(_vertices.size());
+
+        noVertex(u);
+
+        for (Edge<V, E> edge : _adjacencies.get(u).values()) {
+            if (edge != null) {
+                arr.add(_vertices.get(edge.getV()));
+            }
+        }
+
+        return arr.iterator();
     }
 
 
@@ -271,16 +236,12 @@ public class ListGraph<V, E> extends DirectedGraph<V, E>
      *
      * @return A new iterator object
      */
-    public Iterator<Edge<V, E>> edges()
-    {
+    public Iterator<Edge<V, E>> edges() {
         ArrayList<Edge<V, E>> arr = new ArrayList<>();
 
-        for (HashMap<V, Edge<V, E>> v : _adjacencies.values())
-        {
-            for (Edge<V, E> edge : v.values())
-            {
-                if (edge != null)
-                {
+        for (HashMap<V, Edge<V, E>> v : _adjacencies.values()) {
+            for (Edge<V, E> edge : v.values()) {
+                if (edge != null) {
                     arr.add(edge);
                 }
             }
@@ -293,8 +254,7 @@ public class ListGraph<V, E> extends DirectedGraph<V, E>
     /**
      * Clears the existing graph
      */
-    public void clear()
-    {
+    public void clear() {
         _vertices.clear();
         _adjacencies.clear();
 
@@ -308,8 +268,7 @@ public class ListGraph<V, E> extends DirectedGraph<V, E>
      *
      * @return True if size is 0, else false
      */
-    public boolean isEmpty()
-    {
+    public boolean isEmpty() {
         return _size == 0;
     }
 
@@ -320,11 +279,33 @@ public class ListGraph<V, E> extends DirectedGraph<V, E>
      *
      * @param u Source vertex label
      */
-    private void checkNullVertex(V u)
-    {
-        if (u == null)
-        {
+    private void nullVertex(V u) {
+        if (u == null) {
             throw new IllegalArgumentException("Error: Null is considered an invalid value");
+        }
+    }
+
+
+    /**
+     * Exception handler for non-existent vertices
+     *
+     * @param u Source vertex label
+     */
+    private void noVertex(V u) {
+        if (!contains(u)) {
+            throw new NoSuchVertexException();
+        }
+    }
+
+
+    /**
+     * Exception handler for duplicate vertices
+     *
+     * @param u Source vertex label
+     */
+    private void duplicateVertex(V u) {
+        if (contains(u)) {
+            throw new DuplicateVertexException();
         }
     }
 
@@ -334,11 +315,35 @@ public class ListGraph<V, E> extends DirectedGraph<V, E>
      *
      * @param e Edge label
      */
-    private void checkNullEdge(E e)
-    {
-        if (e == null)
-        {
+    private void nullEdge(E e) {
+        if (e == null) {
             throw new IllegalArgumentException("Error: Null is considered an invalid value");
+        }
+    }
+
+
+    /**
+     * Exception handler for non-existent edges
+     *
+     * @param u Source vertex label
+     * @param v Destination vertex label
+     */
+    private void noEdge(V u, V v) {
+        if (!containsEdge(u, v)) {
+            throw new NoSuchEdgeException();
+        }
+    }
+
+
+    /**
+     * Exception handler for duplicate edges
+     *
+     * @param u Source vertex label
+     * @param v Destination vertex label
+     */
+    private void duplicateEdge(V u, V v) {
+        if (containsEdge(u, v)) {
+            throw new DuplicateEdgeException();
         }
     }
 }
